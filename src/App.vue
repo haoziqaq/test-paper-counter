@@ -4,9 +4,11 @@ interface Histroy {
   completedOrder: number
 }
 
-let count = $ref(0)
-let completedOrder = $ref(0)
-let currentOrder = $ref(1)
+interface Result {
+  count: number
+  currentOrder: number
+  completedOrder: number
+}
 
 let historyInfo = $ref('')
 
@@ -15,6 +17,14 @@ const files = $ref([])
 const history: Histroy[] = localStorage.getItem('history')
   ? JSON.parse(localStorage.getItem('history')!)
   : []
+
+const result: Histroy[] = localStorage.getItem('result')
+  ? JSON.parse(localStorage.getItem('result')!)
+  : { count: 0, completedOrder: 0, currentOrder: 1 }
+
+let count = $ref(result.count)
+let completedOrder = $ref(result.completedOrder)
+let currentOrder = $ref(result.currentOrder)
 
 window.addEventListener('keydown', (event) => {
   const key = Number(event.key)
@@ -27,6 +37,7 @@ window.addEventListener('keydown', (event) => {
     count += key
 
     localStorage.setItem('history', JSON.stringify(history))
+    localStorage.setItem('result', JSON.stringify({ count, currentOrder, completedOrder }))
   }
 
   if (event.key === 'Backspace') {
@@ -54,6 +65,7 @@ const redo = () => {
   completedOrder = last.completedOrder
   currentOrder = completedOrder + 1
   localStorage.setItem('history', JSON.stringify(history))
+  localStorage.setItem('result', JSON.stringify({ count, currentOrder, completedOrder }))
 }
 
 const showHistory = () => {
@@ -81,7 +93,7 @@ const showHistory = () => {
       <var-button type="warning" @click="redo">撤销</var-button>
 
       <var-button type="info" @click="showHistory">批改记录</var-button>
-      <var-button type="danger" @click="clear">清空</var-button>
+      <var-button type="danger" @click="clear">重置</var-button>
     </var-space>
 
     <div mt-4 style="font-size: 14px;">键盘 1 -> 9 打分, BackSpace 撤销一次操作</div>
